@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white">Quản Lý Vé Xe</h2>
+        <button class="btn btn-info btn-sm" onclick="location.reload()">Làm mới dữ liệu</button>
+    </div>
+
+    <div class="card shadow bg-dark text-white">
+        <div class="card-body p-0">
+            <table class="table table-dark table-hover mb-0">
+                <thead>
+                    <tr class="text-info">
+                        <th>Mã Chuyến</th>
+                        <th>Khách Hàng</th>
+                        <th>Số Ghế</th>
+                        <th>Giá Vé</th>
+                        <th>Trạng Thái</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in tickets %}
+                    <tr>
+                        <td><strong>#{{ t.id }}</strong></td>
+                        <td>{{ t.khach }}</td>
+                        <td><span class="badge bg-secondary">{{ t.ghe }}</span></td>
+                        <td>{{ "{:,.0f}".format(t.gia).replace(',', '.') }}đ</td>
+                        <td>
+                            {% if t.status == 'Đã thanh toán' %}
+                                <span class="badge bg-success">Đã thanh toán</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">{{ t.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-light"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">Chưa có dữ liệu vé nào trong hệ thống.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table thead th { border-top: none; padding: 15px; }
+    .table tbody td { padding: 15px; vertical-align: middle; }
+    .card { border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+</style>
+{% endblock %}

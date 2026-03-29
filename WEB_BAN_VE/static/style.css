@@ -1,0 +1,46 @@
+/* --- PHẦN CHUNG --- */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* --- STYLE CHO KHÁCH HÀNG (CLIENT) --- */
+.client-theme {
+    background-color: #03045e;
+}
+
+.btn-search {
+    background: #0077b6;
+    color: white;
+    /* ... giữ các style cũ ... */
+}
+
+/* --- STYLE CHO CHỦ XE (ADMIN) --- */
+.admin-theme {
+    background-color: #1a1a2e; /* Màu tối hơn cho quản trị */
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 4px solid #2ecc71; /* Màu xanh lá cho doanh thu */
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.table-tickets {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+    font-size: 14px;
+}
+
+.table-tickets th, .table-tickets td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    text-align: left;
+}
+
+.status-paid { color: #2ecc71; font-weight: bold; }
+.status-pending { color: #f1c40f; font-weight: bold; }

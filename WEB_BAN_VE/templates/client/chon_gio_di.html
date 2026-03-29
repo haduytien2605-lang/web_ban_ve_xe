@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    body { background-color: #03045e; margin: 0; padding: 0; }
+
+    /* Header */
+    .header-nav {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 15px; background-color: white; color: #333;
+    }
+    .back-btn { font-size: 20px; color: #333; text-decoration: none; width: 40px; }
+    .header-title { font-size: 18px; font-weight: bold; flex-grow: 1; text-align: center; }
+    .filter-btn { width: 40px; text-align: right; font-size: 18px; }
+
+    /* Route Card */
+    .route-container { padding: 15px; }
+    .route-card {
+        background: white; border-radius: 15px; padding: 20px;
+        display: flex; align-items: center; justify-content: center;
+        gap: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .route-name { color: #03045e; font-weight: bold; font-size: 16px; }
+
+    /* Date Picker */
+    .date-picker {
+        background: white; margin: 0 15px 15px 15px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: space-between; padding: 10px 15px;
+    }
+    .date-display { color: #333; font-weight: 600; font-size: 15px; }
+
+    /* Bus List */
+    .bus-list { padding: 0 15px; }
+    .bus-card {
+        background: white; border-radius: 15px; margin-bottom: 15px;
+        display: flex; overflow: hidden; cursor: pointer;
+        transition: transform 0.2s;
+        text-decoration: none; /* Bỏ gạch chân nếu dùng thẻ a */
+    }
+    .bus-card:active { transform: scale(0.98); }
+
+    .bus-info { padding: 15px; flex: 2; border-right: 1px dashed #ccc; }
+    .bus-name { color: #03045e; font-size: 17px; font-weight: bold; margin-bottom: 8px; }
+    .info-item { color: #666; font-size: 13px; margin: 4px 0; display: flex; align-items: center; gap: 5px; }
+    .seat-count { color: #f39c12; font-weight: bold; }
+    
+    .bus-price {
+        flex: 1; display: flex; flex-direction: column;
+        justify-content: center; align-items: center; background-color: #f8f9fa;
+    }
+    .time-slot { color: #0077b6; font-weight: bold; font-size: 18px; }
+    .price-value { color: #0077b6; font-weight: bold; font-size: 16px; }
+    
+    .progress-bar { height: 4px; background: #eee; width: 100%; margin-top: 10px; border-radius: 2px; }
+    .progress-fill { height: 100%; background: #0077b6; border-radius: 2px; }
+</style>
+
+<div class="header-nav">
+    <a href="{{ url_for('index') }}" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+    <div class="header-title">Tìm vé</div>
+    <div class="filter-btn"><i class="fas fa-sliders-h"></i></div>
+</div>
+
+<div class="route-container">
+    <div class="route-card">
+        <span class="route-name" id="display-from">Đang tải...</span>
+        <i class="fas fa-bus" style="color: #03045e;"></i>
+        <span class="route-name" id="display-to">Đang tải...</span>
+    </div>
+</div>
+
+<div class="date-picker">
+    <i class="fas fa-chevron-left" style="color: #666;"></i>
+    <div class="date-display" id="display-date">Đang tải ngày...</div>
+    <i class="fas fa-chevron-right" style="color: #666;"></i>
+</div>
+
+<div class="bus-list">
+    <!-- Chuyến 1 - Gán mã CX001 -->
+    <div class="bus-card" onclick="window.location.href='{{ url_for('seat', machuyen='CX001') }}'">
+        <div class="bus-info">
+            <div class="bus-name">Vận Tải Duy Tiến</div>
+            <div class="info-item"><i class="far fa-calendar-alt"></i> <span class="card-date">...</span></div>
+            <div class="info-item"><i class="fas fa-bus"></i> XE LIMOUSINE 7 CHỖ VIP</div>
+            <div class="info-item">Còn <span class="seat-count">5/7</span> chỗ trống</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 70%;"></div></div>
+        </div>
+        <div class="bus-price">
+            <div class="time-slot">00:00</div>
+            <div class="price-value">300.000 VNĐ</div>
+        </div>
+    </div>
+
+    <!-- Chuyến 2 - Gán mã CX002 -->
+    <div class="bus-card" onclick="window.location.href='{{ url_for('seat', machuyen='CX002') }}'">
+        <div class="bus-info">
+            <div class="bus-name">Vận Tải Duy Tiến</div>
+            <div class="info-item"><i class="far fa-calendar-alt"></i> <span class="card-date">...</span></div>
+            <div class="info-item"><i class="fas fa-bus"></i> XE LIMOUSINE 7 CHỖ VIP</div>
+            <div class="info-item">Còn <span class="seat-count">2/7</span> chỗ trống</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 30%;"></div></div>
+        </div>
+        <div class="bus-price">
+            <div class="time-slot">01:00</div>
+            <div class="price-value">300.000 VNĐ</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. Lấy dữ liệu từ LocalStorage
+        const dep = localStorage.getItem('diem_di') || 'Nghệ An';
+        const des = localStorage.getItem('diem_den') || 'Hà Nội';
+        const dateRaw = localStorage.getItem('ngay_di'); 
+
+        // 2. Hiển thị Điểm đi/đến
+        document.getElementById('display-from').innerText = dep;
+        document.getElementById('display-to').innerText = des;
+
+        // 3. Xử lý và hiển thị ngày
+        if (dateRaw) {
+            const parts = dateRaw.split('-');
+            const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+            
+            document.getElementById('display-date').innerText = "Ngày " + formattedDate;
+            
+            const cardDates = document.querySelectorAll('.card-date');
+            cardDates.forEach(el => el.innerText = formattedDate);
+        } else {
+            document.getElementById('display-date').innerText = "Chưa chọn ngày";
+        }
+    });
+</script>
+{% endblock %}

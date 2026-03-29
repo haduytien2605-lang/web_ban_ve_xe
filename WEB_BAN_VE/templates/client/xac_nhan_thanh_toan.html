@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-color: #e67e22; 
+        --text-color: #333;
+        --bg-color: #03045e; /* Đồng bộ nền xanh với toàn hệ thống */
+    }
+
+    body {
+        background-color: var(--bg-color) !important;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    .ticket-container {
+        background-color: #fff;
+        width: 100%;
+        max-width: 400px; 
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        padding: 25px;
+        position: relative;
+        border-top: 8px solid var(--primary-color);
+        color: var(--text-color);
+    }
+
+    .ticket-header {
+        text-align: center;
+        border-bottom: 2px dashed #ddd;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+    }
+
+    .nha-xe-name {
+        font-size: 22px;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin: 0;
+        text-transform: uppercase;
+    }
+
+    .hotline {
+        font-size: 14px;
+        color: #666;
+        margin: 5px 0 0 0;
+    }
+
+    .ticket-title {
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        text-transform: uppercase;
+        margin: 15px 0;
+        color: #03045e;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+
+    .info-label {
+        font-weight: bold;
+        color: #777;
+        flex: 0 0 40%;
+    }
+
+    .info-value {
+        text-align: right;
+        flex: 0 0 60%;
+        font-weight: 600;
+    }
+
+    .highlight-value {
+        color: var(--primary-color);
+        font-size: 16px;
+    }
+
+    .total-payment {
+        border-top: 2px solid #eee;
+        border-bottom: 2px solid #eee;
+        padding: 15px 0;
+        margin: 20px 0;
+        text-align: center;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+    }
+
+    .total-label {
+        font-size: 14px;
+        font-weight: bold;
+        display: block;
+        color: #555;
+    }
+
+    .total-amount {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--primary-color);
+    }
+
+    .payment-actions {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .btn {
+        display: block;
+        padding: 15px;
+        font-size: 16px;
+        font-weight: bold;
+        text-decoration: none;
+        border-radius: 12px;
+        cursor: pointer;
+        width: 100%;
+        margin-bottom: 12px;
+        box-sizing: border-box;
+        border: none;
+        transition: 0.3s;
+        text-align: center;
+    }
+
+    .btn-pay {
+        background: linear-gradient(45deg, #27ae60, #2ecc71);
+        color: white;
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+    }
+
+    .btn-pay:hover { transform: translateY(-2px); }
+
+    .btn-back {
+        background-color: #eee;
+        color: #666;
+    }
+</style>
+
+<div class="ticket-container">
+    <div class="ticket-header">
+        <h1 class="nha-xe-name">{{ ticket.nha_xe }}</h1>
+        <p class="hotline">Hotline: {{ ticket.hotline }}</p>
+    </div>
+
+    <div class="ticket-title">XÁC NHẬN VÉ XE</div>
+
+    <div class="info-row">
+        <span class="info-label">Khách hàng:</span>
+        <span class="info-value">{{ ticket.khach_hang }}</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Số ĐT:</span>
+        <span class="info-value">{{ ticket.so_dt }}</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Tuyến đường:</span>
+        <span class="info-value">{{ ticket.tuyen_duong }}</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Số ghế:</span>
+        <span class="info-value highlight-value" id="display-seats">{{ ticket.so_ghe }}</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Thời gian KH:</span>
+        <span class="info-value" style="color: #d35400;">{{ ticket.thoi_gian }}</span>
+    </div>
+    
+    <div style="border-top: 1px dashed #ddd; margin: 15px 0;"></div>
+
+    <div class="info-row">
+        <span class="info-label">Điểm đón:</span>
+        <span class="info-value">{{ ticket.diem_len }}</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Điểm trả:</span>
+        <span class="info-value">{{ ticket.diem_xuong }}</span>
+    </div>
+
+    <div class="total-payment">
+        <span class="total-label">TỔNG TIỀN THANH TOÁN</span>
+        <span class="total-amount" id="display-total">
+            {{ "{:,.0f}".format(ticket.tong_tien).replace(',', '.') }} VNĐ
+        </span>
+    </div>
+
+    <div class="payment-actions">
+        <button class="btn btn-pay" onclick="handlePayment()">
+            <i class="fas fa-check-circle"></i> XÁC NHẬN & THANH TOÁN
+        </button>
+        <a href="{{ url_for('seat') }}" class="btn btn-back">Thay đổi chỗ ngồi</a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Tự động tính lại tiền dựa trên số lượng ghế thực tế từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const ghe = urlParams.get('ghe');
+        if (ghe) {
+            const listGhe = ghe.split(',').map(s => s.trim());
+            const soLuong = listGhe.length;
+            const giaGoc = parseInt("{{ ticket.tong_tien }}");
+            const tongMoi = giaGoc * soLuong;
+
+            document.getElementById('display-seats').innerText = ghe;
+            document.getElementById('display-total').innerText = tongMoi.toLocaleString('vi-VN').replace(/,/g, '.') + ' VNĐ';
+        }
+    });
+
+    function handlePayment() {
+        if(confirm("Xác nhận thanh toán vé xe này?")) {
+            alert("Cảm ơn bạn! Hệ thống đang xử lý giao dịch...");
+            window.location.href = "{{ url_for('index') }}";
+        }
+    }
+</script>
+{% endblock %}

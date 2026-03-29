@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Nền và bố cục chung */
+    body { background-color: #03045e; color: white; }
+    
+    .account-container {
+        max-width: 500px;
+        margin: 20px auto;
+        padding: 0 15px 100px 15px; /* Để trống phần dưới cho thanh Nav */
+    }
+
+    /* Thẻ thông tin người dùng */
+    .profile-card {
+        background: linear-gradient(45deg, #023e8a, #0077b6);
+        padding: 25px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        margin-bottom: 25px;
+    }
+
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        background: #caf0f8;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px auto;
+        color: #03045e;
+        font-size: 35px;
+        border: 4px solid rgba(255,255,255,0.2);
+    }
+
+    .profile-name { font-size: 20px; font-weight: bold; margin: 5px 0; }
+    .profile-role { font-size: 13px; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* Danh sách vé */
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .ticket-item {
+        background: white;
+        color: #333;
+        padding: 18px;
+        border-radius: 15px;
+        margin-bottom: 15px;
+        border-left: 6px solid #e67e22; /* Màu cam Duy Tiến */
+        position: relative;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .ticket-route { font-weight: bold; color: #03045e; font-size: 16px; margin-bottom: 8px; }
+    .ticket-info { font-size: 13px; color: #666; margin-bottom: 5px; }
+    .ticket-status {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: bold;
+        background: #d4edda;
+        color: #155724;
+        margin-top: 10px;
+    }
+
+    .logout-box { text-align: center; margin-top: 30px; }
+    .btn-logout-alt {
+        color: #ff4d4d;
+        text-decoration: none;
+        font-size: 14px;
+        border: 1px solid #ff4d4d;
+        padding: 8px 20px;
+        border-radius: 10px;
+        transition: 0.3s;
+    }
+    .btn-logout-alt:hover { background: #ff4d4d; color: white; }
+</style>
+
+<div class="account-container">
+    <!-- 1. Thông tin cá nhân -->
+    <div class="profile-card">
+        <div class="profile-avatar">
+            <i class="fas fa-user"></i>
+        </div>
+        <div class="profile-name">{{ session.user_name }}</div>
+        <div class="profile-role">Khách hàng thân thiết</div>
+    </div>
+
+    <!-- 2. Danh sách vé hiện tại -->
+    <div class="section-title">
+        <i class="fas fa-ticket-alt" style="color: #ffb703;"></i> Vé xe của bạn
+    </div>
+
+    <div class="ticket-item">
+        <div class="ticket-route">Vinh <i class="fas fa-arrow-right" style="font-size: 12px; margin: 0 5px;"></i> Hà Nội</div>
+        <div class="ticket-info">
+            <i class="far fa-calendar-alt"></i> Ngày đi: <b>27/03/2026</b>
+        </div>
+        <div class="ticket-info">
+            <i class="far fa-clock"></i> Giờ khởi hành: <b>23:15</b>
+        </div>
+        <div class="ticket-info">
+            <i class="fas fa-couch"></i> Ghế đã chọn: <b style="color: #e67e22;">A1, A2</b>
+        </div>
+        <div class="ticket-status">
+            <i class="fas fa-check-circle"></i> ĐÃ XÁC NHẬN
+        </div>
+    </div>
+
+    <!-- Có thể thêm vé cũ/lịch sử ở đây -->
+    <div style="opacity: 0.5; text-align: center; font-size: 12px; margin-top: 20px;">
+        Chỉ hiển thị vé trong 30 ngày gần nhất
+    </div>
+
+    <!-- 3. Đăng xuất -->
+    <div class="logout-box">
+        <a href="{{ url_for('logout') }}" class="btn-logout-alt">
+            <i class="fas fa-sign-out-alt"></i> Đăng xuất tài khoản
+        </a>
+    </div>
+</div>
+{% endblock %}

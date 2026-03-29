@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #195ea8 0%, #3a3a5e 100%) !important;
+        margin: 0; padding: 0; height: 100vh; overflow: hidden;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    }
+    .main-container { max-width: 450px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; align-items: center; }
+    .header { padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; width: 100%; box-sizing: border-box; }
+    .back-nav { color: #03045e !important; background: #ffb703 !important; padding: 8px 15px; border-radius: 12px; text-decoration: none; font-size: 13px; font-weight: bold; }
+    
+    /* Layout ghế */
+    .bus-layout { display: flex; justify-content: center; gap: 30px; width: 100%; margin: 20px 0; align-items: center; }
+    .seat-row { display: flex; flex-direction: column; gap: 15px; }
+    
+    /* Style cơ bản của ghế */
+    .seat { 
+        width: 55px; height: 55px; 
+        border: 2px solid #48cae4; 
+        border-radius: 15px; 
+        display: flex; align-items: center; justify-content: center; 
+        color: white; font-weight: bold; 
+        cursor: pointer; transition: 0.2s; 
+        background: rgba(255, 255, 255, 0.05); 
+    }
+    
+    .seat.selected { background: #2ecc71 !important; border-color: #27ae60 !important; transform: scale(1.05); color: white; }
+    
+    .seat.booked { 
+        background: #f1c40f !important; 
+        border-color: #f39c12 !important; 
+        color: #333 !important; 
+        cursor: not-allowed; 
+        opacity: 0.8;
+    }
+
+    /* Chú thích */
+    .legend-container { padding: 12px 20px; background: rgba(255, 255, 255, 0.05); margin: 0 40px 15px 40px; border-radius: 15px; font-size: 12px; color: #90e0ef; width: 85%; box-sizing: border-box; }
+    .legend-item { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+    .dot { width: 12px; height: 12px; border-radius: 4px; }
+    .dot-selected { background: #2ecc71; }
+    .dot-available { border: 1px solid #48cae4; } 
+    .dot-booked { background: #f1c40f; }
+
+    /* Phần xác nhận */
+    .action-container { margin: 0 20px 20px 20px; padding: 20px; background: rgba(10, 25, 80, 0.85); border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); width: 85%; box-sizing: border-box; }
+    .btn-confirm { width: 100%; background: #00b4d8; color: #03045e; border: none; padding: 16px; border-radius: 14px; font-weight: 700; font-size: 15px; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
+</style>
+
+<div class="main-container">
+    <div class="header">
+        <a href="{{ url_for('pick_time') }}" class="back-nav">← Quay lại</a>
+        <h3 style="margin: 0; color: white; font-size: 16px;">SƠ ĐỒ 7 CHỖ</h3>
+        <div style="width: 70px;"></div> 
+    </div>
+
+    <!-- Hiển thị mã chuyến xe đang chọn (ẩn hoặc hiện tùy bạn) -->
+    <div style="color: #90e0ef; font-size: 12px; margin-bottom: 10px;">Mã chuyến: {{ machuyen }}</div>
+
+    <div class="bus-layout">
+        {% macro render_seat(seat_id) %}
+            {% if seat_id in booked_seats %}
+                <div class="seat booked">{{ seat_id }}</div>
+            {% else %}
+                <div class="seat" onclick="toggleSeat(this)">{{ seat_id }}</div>
+            {% endif %}
+        {% endmacro %}
+
+        <div class="seat-row">
+            {{ render_seat('A1') }}
+            {{ render_seat('A2') }}
+            {{ render_seat('A3') }}
+        </div>
+        <div class="seat-row">
+            {{ render_seat('B1') }}
+            {{ render_seat('B2') }} 
+            {{ render_seat('B3') }}
+            {{ render_seat('B4') }}
+        </div>
+    </div>
+
+    <div class="legend-container">
+        <div class="legend-item"><span class="dot dot-booked"></span> <span>Ghế đã đặt </span></div>
+        <div class="legend-item"><span class="dot dot-selected"></span> <span>Ghế đang chọn</span></div>
+        <div class="legend-item"><span class="dot dot-available"></span> <span>Ghế trống</span></div>
+    </div>
+
+    <div class="action-container">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; color: white;">
+            <span style="font-size: 14px; opacity: 0.9;">Giá vé tạm tính:</span>
+            <span id="total-price" style="font-weight: bold; font-size: 20px; color: #ffb703;">0đ</span>
+        </div>
+        <button class="btn-confirm" onclick="confirmBooking()">XÁC NHẬN ĐẶT VÉ</button>
+    </div>
+</div>
+
+<script>
+    function toggleSeat(seat) {
+        if (seat.classList.contains('booked')) return;
+        
+        seat.classList.toggle('selected');
+        const count = document.querySelectorAll('.seat.selected').length;
+        const total = count * 300000;
+        document.getElementById('total-price').innerText = total.toLocaleString('vi-VN') + 'đ';
+    }
+
+    function confirmBooking() {
+        const selected = document.querySelectorAll('.seat.selected');
+        if (selected.length === 0) {
+            alert("Vui lòng chọn ít nhất một chỗ ngồi trống!");
+        } else {
+            // Lấy danh sách tên ghế (ví dụ: "A1, B2")
+            const seatNames = Array.from(selected).map(s => s.innerText).join(', ');
+            
+            // Lấy mã chuyến từ server gửi xuống thông qua biến Jinja2
+            const machuyen = "{{ machuyen }}";
+            
+            // CHUYỂN TRANG: Gửi kèm tên ghế qua tham số URL '?ghe=...'
+            // Route /payment sẽ nhận tham số này để hiển thị trên hóa đơn
+            window.location.href = "{{ url_for('payment') }}?ghe=" + encodeURIComponent(seatNames);
+        }
+    }
+</script>
+{% endblock %}

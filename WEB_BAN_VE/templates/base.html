@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vận Tải Duy Tiến</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #03045e; 
+            color: white; 
+            overflow-x: hidden;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%; 
+            background: rgba(10, 25, 80, 0.95); 
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: space-around; 
+            align-items: center;
+            padding: 12px 0 25px 0;
+            border-top: 1px solid rgba(72, 202, 228, 0.2);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            flex: 1; 
+            text-align: center;
+            text-decoration: none;
+            color: #90e0ef;
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: 0.3s;
+        }
+
+        .nav-item i { font-size: 22px; margin-bottom: 2px; }
+
+        .nav-item.active { color: #ffb703; }
+
+        .nav-item:active { transform: scale(0.9); }
+
+        .content-wrapper { padding-bottom: 100px; }
+
+        /* Style riêng cho nút Logout */
+        .nav-item.logout { color: #ff4d4d; }
+    </style>
+</head>
+<body>
+
+    <div class="content-wrapper"> 
+        {% block content %}{% endblock %}
+    </div>
+
+    {# 1. Kiểm tra nếu không phải trang Login thì mới hiện Nav #}
+    {% if request.endpoint not in ['login', None] %}
+        <div class="bottom-nav">
+            
+            {# --- NHÁNH 1: MENU CHO CHỦ XE (ADMIN) --- #}
+            {% if session.get('role') == 'admin' %}
+                <a href="{{ url_for('admin_dashboard') }}" class="nav-item {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Thống kê</span>
+                </a>
+                <a href="{{ url_for('manage_tickets') }}" class="nav-item {% if request.endpoint == 'manage_tickets' %}active{% endif %}">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Quản lý vé</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="nav-item logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Thoát</span>
+                </a>
+
+            {# --- NHÁNH 2: MENU CHO KHÁCH HÀNG (CLIENT) --- #}
+            {% else %}
+                <a href="{{ url_for('index') }}" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">
+                    <i class="fas fa-home"></i>
+                    <span>Trang chủ</span>
+                </a>
+                {# ĐÃ SỬA: Thay 'thông báo' bằng 'notifications' khớp với app.py #}
+                <a href="{{ url_for('notifications') }}" class="nav-item {% if request.endpoint == 'notifications' %}active{% endif %}">
+                    <i class="fas fa-bell"></i>
+                    <span>Thông báo</span>
+                </a>
+                <a href="{{ url_for('account') }}" class="nav-item {% if request.endpoint == 'account' %}active{% endif %}">
+                    <i class="fas fa-user"></i>
+                    <span>Tài khoản</span>
+                </a>
+            {% endif %}
+
+        </div>
+    {% endif %}
+
+</body>
+</html>
