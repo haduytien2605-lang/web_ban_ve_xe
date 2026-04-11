@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NÚI MÃ - Trải nghiệm vận tải đẳng cấp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}" class="nav-brand"><i class="fas fa-bus-alt"></i> NÚI MÃ</a>
+        <div class="nav-links">
+            {% if session.get('role') != 'admin' %}
+            <a href="{{ url_for('index') }}">Trang chủ</a>
+            {% endif %}
+
+            {% if session.get('user_id') %}
+            {% if session.get('role') == 'admin' %}
+            <a href="{{ url_for('admin') }}">Dashboard Admin</a>
+            {% else %}
+            <a href="{{ url_for('trips') }}">Đặt vé ngay</a>
+            <a href="{{ url_for('mytickets') }}">Vé của tôi</a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}">Đăng xuất ({{ session.get('user_name') }})</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">Đăng nhập</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block content %}
+<div>
+    <div class="d-flex justify-between align-center mb-4">
+        <a href="{{ url_for('trips') }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay lại</a>
+        <h2><i class="fas fa-chair"></i> Sơ đồ ghế ngồi</h2>
+        <div style="width: 100px;"></div>
+    </div>
+
+    <div class="glass-card" style="max-width: 600px; margin: 0 auto;">
+
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">Đầu xe <i
+                    class="fas fa-steering-wheel"></i></div>
+            <div style="height: 2px; background: var(--border); width: 80%; margin: 10px auto;"></div>
+        </div>
+
+        <div class="seat-bus">
+            <div class="seat-col">
+                <div class="seat {% if 'A1' in booked_seats %}booked{% endif %}" onclick="toggleSeat(this)">A1</div>
+                <div class="seat {% if 'A2' in booked_seats %}booked{% endif %}" onclick="toggleSeat(this)">A2</div>
+                <div class="seat {% if 'A3' in booked_seats %}booked{% endif %}" onclick="toggleSeat(this)">A3</div>
+            </div>
+
+            <div style="width: 40px;"></div> <!-- Lối đi -->
+
+            <div class="seat-col">
+                <div class="seat {% if 'B1' in booked_seats %}booked{% endif %}" onclick="toggleSeat(this)">B1</div>
+                <div class="seat {% if 'B2' in booked_seats %}booked{% endif %}" onclick="toggleSeat(this)">B2</div>
+                <div class="seat {% if 'B3' in booked_seats %}booked{% endif %}" onclick="toggleSeat(this)">B3</div>
+                <div class="seat {% if 'B4' in booked_seats %}booked{% endif %}" onclick="toggleSeat(this)">B4</div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-between align-center"
+            style="margin: 2rem 0; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 1rem;">
+            <div class="d-flex align-center"><span class="seat booked"
+                    style="width: 30px; height: 30px; margin-right: 10px; cursor: default;">X</span> Đã đặt</div>
+            <div class="d-flex align-center"><span class="seat selected"
+                    style="width: 30px; height: 30px; margin-right: 10px; cursor: default;">✓</span> Đang chọn</div>
+            <div class="d-flex align-center"><span class="seat"
+                    style="width: 30px; height: 30px; margin-right: 10px; cursor: default;"></span> Trống</div>
+        </div>
+
+        <div style="text-align: center;">
+            <div style="font-size: 1.2rem; margin-bottom: 1rem;">Tạm tính: <strong id="total-price"
+                    style="color: var(--primary); font-size: 1.5rem;">0 VNĐ</strong></div>
+            <button class="btn" style="width: 100%;" onclick="confirmSeats()">TIẾP TỤC THANH TOÁN <i
+                    class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const GIA_VE = {{ giave }};
+
+    function toggleSeat(elem) {
+        if (elem.classList.contains('booked')) return;
+        elem.classList.toggle('selected');
+
+        const count = document.querySelectorAll('.seat-bus .seat.selected').length;
+        const total = count * GIA_VE;
+        document.getElementById('total-price').innerText = total.toLocaleString('vi-VN') + ' VNĐ';
+    }
+
+    function confirmSeats() {
+        const selected = document.querySelectorAll('.seat-bus .seat.selected');
+        if (selected.length === 0) {
+            alert("Vui lòng chọn ít nhất 1 ghế trống!");
+            return;
+        }
+
+        const seats = Array.from(selected).map(s => s.innerText).join(',');
+        window.location.href = "{{ url_for('payment') }}?ghe=" + encodeURIComponent(seats) + "&giave=" + GIA_VE;
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block content %}
+<div>
+    <div class="d-flex justify-between align-center mb-4">
+        <h2><i class="fas fa-ticket-alt"></i> Vé xe của tôi</h2>
+        <a href="{{ url_for('trips') }}" class="btn btn-secondary"><i class="fas fa-plus"></i> Đặt thêm vé</a>
+    </div>
+
+    {% if not tickets %}
+        <div class="glass-card" style="text-align: center; padding: 4rem 2rem;">
+            <i class="fas fa-box-open" style="font-size: 4rem; color: var(--border); margin-bottom: 1rem;"></i>
+            <h3>Bạn chưa đặt vé nào</h3>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Hãy đặt ngay một chuyến xe để trải nghiệm dịch vụ của chúng tôi!</p>
+            <a href="{{ url_for('trips') }}" class="btn">Đặt vé ngay</a>
+        </div>
+    {% else %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem;">
+            {% for ticket in tickets %}
+                <div class="glass-card hover-lift" style="position: relative; overflow: hidden;">
+                    <!-- Decal viền đánh dấu vé xe -->
+                    <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary);"></div>
+                    <div style="position: absolute; right: -20px; top: 15px; background: var(--success); color: white; padding: 5px 30px; transform: rotate(45deg); font-size: 0.8rem; font-weight: bold;">Đã Đặt</div>
+                    
+                    <div class="d-flex justify-between align-center mb-3">
+                        <span style="color: var(--text-muted); font-size: 0.9rem;">Mã chuyến: <strong>{{ ticket.MaChuyen }}</strong></span>
+                        <span style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary); padding: 5px 10px; border-radius: 1rem; font-weight: bold; font-size: 0.9rem;">Ghế: {{ ticket.MaGhe }}</span>
+                    </div>
+                    
+                    <div class="d-flex justify-between align-center" style="margin-bottom: 1.5rem;">
+                        <div style="text-align: center; flex: 1;">
+                            <div style="font-weight: bold; font-size: 1.2rem;">{{ ticket.DiemDi }}</div>
+                        </div>
+                        <div style="flex: 1; text-align: center; color: var(--primary);">
+                            <i class="fas fa-long-arrow-alt-right" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div style="text-align: center; flex: 1;">
+                            <div style="font-weight: bold; font-size: 1.2rem;">{{ ticket.DiemDen }}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="border-top: 1px dashed var(--border); margin-bottom: 1rem;"></div>
+                    
+                    <div class="d-flex align-center mb-2">
+                        <i class="far fa-clock" style="width: 25px; color: var(--text-muted);"></i>
+                        <span>Khởi hành: <strong>{{ ticket.ThoiGian }}</strong></span>
+                    </div>
+                    <div class="d-flex align-center mb-2">
+                        <i class="fas fa-calendar-check" style="width: 25px; color: var(--text-muted);"></i>
+                        <span>Ngày đặt: <strong>{{ ticket.NgayDat }}</strong></span>
+                    </div>
+                    <div class="d-flex align-center mt-3">
+                        <i class="fas fa-money-bill-wave" style="width: 25px; color: var(--text-muted);"></i>
+                        <span>Giá vé: <strong style="color: var(--primary); font-size: 1.2rem;">{{ ticket.GiaVe }}</strong></span>
+                    </div>
+
+                    <!-- NÚT HỦY VÉ -->
+                    <div style="margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1rem; text-align: right;">
+                        <form action="{{ url_for('cancel_ticket', mave=ticket.MaVe) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn HỦY VÉ này không? Số tiền sẽ được trừ ra khỏi doanh thu hệ thống.');">
+                            <button class="btn btn-secondary" style="background: rgba(255, 71, 87, 0.1); color: #ff4757; border: none; padding: 5px 15px; font-size: 0.85rem;">
+                                <i class="fas fa-times-circle"></i> HỦY VÉ NÀY
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

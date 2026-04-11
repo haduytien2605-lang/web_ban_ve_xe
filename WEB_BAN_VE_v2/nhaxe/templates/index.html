@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="text-align: center; padding: 4rem 0;">
+    <h1 style="font-size: 3rem; margin-bottom: 1rem; color: var(--text-main);">
+        Hành trình <span style="color: var(--primary);">Đẳng cấp</span><br>Bắt đầu từ đây
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1.2rem; max-width: 600px; margin: 0 auto 2rem;">
+        Hệ thống đặt vé xe trực tuyến hiện đại nhất. Trải nghiệm ngay dòng xe Limousine 7 chỗ cao cấp với dịch vụ chuẩn 5 sao.
+    </p>
+    <div>
+        {% if session.get('user_id') %}
+            <a href="{{ url_for('trips') }}" class="btn" style="padding: 1rem 2.5rem; font-size: 1.2rem;">Đặt Vé Ngay</a>
+        {% else %}
+            <a href="{{ url_for('login') }}" class="btn" style="padding: 1rem 2.5rem; font-size: 1.2rem;">Đăng Nhập Để Đặt Vé</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

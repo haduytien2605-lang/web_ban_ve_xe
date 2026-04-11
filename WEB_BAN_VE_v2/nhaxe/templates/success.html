@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 600px; margin: 4rem auto; text-align: center;">
+    <div class="glass-card">
+        <i class="fas fa-check-circle" style="font-size: 5rem; color: var(--success); margin-bottom: 2rem;"></i>
+        <h1 style="color: var(--success); margin-bottom: 1rem;">GIAO DỊCH THÀNH CÔNG!</h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2rem;">
+            Tuyệt vời! Ghế của bạn đã được hệ thống ghi nhận. Cảm ơn bạn đã lựa chọn Duy Tiên Bus Transport.
+        </p>
+        <a href="{{ url_for('trips') }}" class="btn" style="padding: 1rem 2rem;">Tiếp tục đặt vé</a>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary" style="padding: 1rem 2rem; margin-left: 1rem;">Về trang chủ</a>
+    </div>
+</div>
+{% endblock %}

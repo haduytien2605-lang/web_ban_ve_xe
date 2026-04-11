@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<div>
+    <div class="d-flex justify-between align-center mb-4">
+        <a href="{{ url_for('seats', machuyen=session.get('current_machuyen')) }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Đổi ghế</a>
+    </div>
+
+    <div class="glass-card" style="max-width: 500px; margin: 0 auto; text-align: center;">
+        <i class="fas fa-clipboard-check" style="font-size: 4rem; color: var(--success); margin-bottom: 1.5rem;"></i>
+        <h2 style="margin-bottom: 1.5rem;">XÁC NHẬN THANH TOÁN</h2>
+        
+        <div style="background: rgba(0,0,0,0.3); border-radius: 1rem; padding: 1.5rem; text-align: left; margin-bottom: 2rem;">
+            <div class="d-flex justify-between mb-4">
+                <span style="color: var(--text-muted);">Khách hàng:</span>
+                <strong>{{ session.get('user_name') }}</strong>
+            </div>
+            <div class="d-flex justify-between mb-4">
+                <span style="color: var(--text-muted);">Chuyến xe số:</span>
+                <strong style="color: var(--primary);">{{ session.get('current_machuyen') }}</strong>
+            </div>
+            <div class="d-flex justify-between mb-4">
+                <span style="color: var(--text-muted);">Danh sách ghế:</span>
+                <strong style="font-size: 1.2rem; color: var(--success);">{{ ghe }}</strong>
+            </div>
+            <div style="border-top: 1px dashed var(--border); margin: 1rem 0;"></div>
+            <div class="d-flex justify-between align-center">
+                <span style="font-size: 1.1rem; font-weight: bold;">TỔNG TIỀN:</span>
+                <strong style="font-size: 2rem; color: var(--primary);">{{ "{:,.0f}".format(tongtien).replace(',', '.') }} ₫</strong>
+            </div>
+        </div>
+
+        <form method="POST" action="">
+            <input type="hidden" name="ghe" value="{{ ghe }}">
+            <input type="hidden" name="tong_tien" value="{{ tongtien }}">
+            <button type="submit" class="btn" style="width: 100%; font-size: 1.2rem; padding: 1rem; background: var(--success);">
+                <i class="fas fa-check"></i> XÁC NHẬN MUA VÉ
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

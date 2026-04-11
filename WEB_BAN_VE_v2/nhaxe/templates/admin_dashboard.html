@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-4 d-flex justify-between align-center">
+    <h2><i class="fas fa-chart-line"></i> Dashboard Quản Trị Hệ Thống</h2>
+    <span class="badge" style="background: var(--danger); padding: 5px 15px; border-radius: 1rem; color: white;">Quyền: Admin</span>
+</div>
+
+<!-- BỘ LỌC THỜI GIAN -->
+<div class="glass-card mb-4" style="padding: 1rem;">
+    <form method="GET" action="{{ url_for('admin') }}" class="d-flex align-center" style="gap: 1.5rem; flex-wrap: wrap;">
+        <div class="d-flex align-center" style="gap: 0.5rem;">
+            <label style="color: var(--text-muted); white-space: nowrap;">Từ ngày:</label>
+            <input type="date" name="start_date" class="form-control" value="{{ start_date or '' }}" style="width: auto;">
+        </div>
+        <div class="d-flex align-center" style="gap: 0.5rem;">
+            <label style="color: var(--text-muted); white-space: nowrap;">Đến ngày:</label>
+            <input type="date" name="end_date" class="form-control" value="{{ end_date or '' }}" style="width: auto;">
+        </div>
+        <div class="d-flex" style="gap: 0.5rem;">
+            <button type="submit" class="btn" style="padding: 8px 20px;"><i class="fas fa-filter"></i> Lọc dữ liệu</button>
+            {% if start_date or end_date %}
+                <a href="{{ url_for('admin') }}" class="btn btn-secondary" style="padding: 8px 20px; background: rgba(255,255,255,0.1);"><i class="fas fa-undo"></i> Reset</a>
+            {% endif %}
+        </div>
+        
+        {% if start_date and end_date %}
+            <div style="color: var(--success); font-weight: bold; margin-left: auto;">
+                <i class="fas fa-info-circle"></i> Đang hiển thị dữ liệu từ {{ start_date }} đến {{ end_date }}
+            </div>
+        {% endif %}
+    </form>
+</div>
+
+<!-- THỐNG KÊ TỔNG QUAN -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+    <div class="glass-card d-flex align-center" style="border-left: 5px solid var(--success);">
+        <div style="background: rgba(46, 213, 115, 0.2); padding: 1rem; border-radius: 50%; margin-right: 1.5rem;">
+            <i class="fas fa-coins" style="font-size: 2rem; color: var(--success);"></i>
+        </div>
+        <div>
+            <h3 style="color: var(--text-muted); font-size: 1rem; font-weight: normal; margin-bottom: 0.5rem;">TỔNG DOANH THU</h3>
+            <div style="font-size: 1.8rem; font-weight: bold; color: var(--primary);">{{ total_revenue }}</div>
+        </div>
+    </div>
+    
+    <div class="glass-card d-flex align-center" style="border-left: 5px solid #ffa502;">
+        <div style="background: rgba(255, 165, 2, 0.2); padding: 1rem; border-radius: 50%; margin-right: 1.5rem;">
+            <i class="fas fa-shopping-cart" style="font-size: 2rem; color: #ffa502;"></i>
+        </div>
+        <div>
+            <h3 style="color: var(--text-muted); font-size: 1rem; font-weight: normal; margin-bottom: 0.5rem;">TỔNG ĐƠN HÀNG</h3>
+            <div style="font-size: 1.8rem; font-weight: bold; color: var(--text);">{{ total_orders }} Đơn</div>
+        </div>
+    </div>
+</div>
+
+<!-- QUẢN LÝ XE & QUẢN LÝ CHUYẾN XE (Chia cột) -->
+<div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 2rem; margin-bottom: 3rem;">
+    
+    <!-- CỘT 1: XE -->
+    <div class="glass-card" style="padding: 1.5rem;">
+        <h3 class="mb-4"><i class="fas fa-car-side"></i> Quản Lý Danh Mục Xe</h3>
+        
+        <form method="POST" action="{{ url_for('add_car') }}" class="mb-4" style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 1rem;">
+            <h4 style="margin-bottom: 1rem; color: var(--primary);">Thêm Xe Mới</h4>
+            <div class="form-group">
+                <input type="text" name="bienso" class="form-control" placeholder="Biển số (VD: 29B-1234)" required>
+            </div>
+            <div class="form-group mb-3">
+                <input type="text" name="loaixe" class="form-control" placeholder="Loại xe (VD: Limousine VIP)" value="Limousine VIP" required>
+            </div>
+            <button class="btn" style="width: 100%;"><i class="fas fa-plus"></i> Thêm Xe (Mặc định 7 chỗ)</button>
+        </form>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border); color: var(--text-muted);">
+                        <th style="padding: 10px;">ID</th>
+                        <th style="padding: 10px;">Biển Số</th>
+                        <th style="padding: 10px;">Loại</th>
+                        <th style="padding: 10px;">Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for xe in cars %}
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 10px;">{{ xe[0] }}</td>
+                        <td style="padding: 10px; font-weight: bold;">{{ xe[1] }}</td>
+                        <td style="padding: 10px; font-size: 0.9rem;">{{ xe[2] }} ({{ xe[3] }} chỗ)</td>
+                        <td style="padding: 10px;">
+                            <form action="{{ url_for('delete_car', maxe=xe[0]) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xoá xe này không?');">
+                                <button class="btn btn-secondary" style="padding: 5px 10px; background: rgba(255,0,0,0.2); color: #ff6b81; border: none;"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" style="text-align: center; padding: 1rem;">Chưa có dữ liệu xe</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- CỘT 2: CHUYẾN XE -->
+    <div class="glass-card" style="padding: 1.5rem;">
+        <h3 class="mb-4"><i class="fas fa-route"></i> Quản Lý Chuyến Xe</h3>
+        
+        <form method="POST" action="{{ url_for('add_trip') }}" class="mb-4 d-flex" style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 1rem; gap: 10px; flex-wrap: wrap;">
+            <select name="maxe" class="form-control" style="flex: 1; min-width: 120px;" required>
+                <option value="">-- Chọn Xe --</option>
+                {% for xe in cars %}
+                <option value="{{ xe[0] }}">{{ xe[1] }}</option>
+                {% endfor %}
+            </select>
+            <select name="diemdi" class="form-control" style="flex: 1; min-width: 100px;" required>
+                <option value="">-- Điểm Đi --</option>
+                <option value="Hà Nội">Hà Nội</option>
+                <option value="Thanh Hóa">Thanh Hóa</option>
+                <option value="Nghệ An">Nghệ An</option>
+                <option value="Hà Tĩnh">Hà Tĩnh</option>
+                <option value="Đà Nẵng">Đà Nẵng</option>
+                <option value="Huế">Huế</option>
+                <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+            </select>
+            <select name="diemden" class="form-control" style="flex: 1; min-width: 100px;" required>
+                <option value="">-- Điểm Đến --</option>
+                <option value="Hà Nội">Hà Nội</option>
+                <option value="Thanh Hóa">Thanh Hóa</option>
+                <option value="Nghệ An">Nghệ An</option>
+                <option value="Hà Tĩnh">Hà Tĩnh</option>
+                <option value="Đà Nẵng">Đà Nẵng</option>
+                <option value="Huế">Huế</option>
+                <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+            </select>
+            <input type="datetime-local" name="thoigian" class="form-control" style="flex: 1.5; min-width: 180px;" required>
+            <input type="number" min="0" name="giave" class="form-control" placeholder="Giá vé (VNĐ)" style="flex: 1; min-width: 100px;" required>
+            <button class="btn" style="flex: 1; min-width: 120px;"><i class="fas fa-plus"></i> Tạo</button>
+        </form>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border); color: var(--text-muted);">
+                        <th style="padding: 10px;">ID</th>
+                        <th style="padding: 10px;">Xe</th>
+                        <th style="padding: 10px;">Lịch trình</th>
+                        <th style="padding: 10px;">Khởi hành</th>
+                        <th style="padding: 10px;">Giá</th>
+                        <th style="padding: 10px;">Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trip in trips %}
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 10px;">{{ trip[0] }}</td>
+                        <td style="padding: 10px;"><strong>{{ trip[1] }}</strong></td>
+                        <td style="padding: 10px; color: var(--primary);">{{ trip[2] }} <i class="fas fa-arrow-right"></i> {{ trip[3] }}</td>
+                        <td style="padding: 10px;">{{ trip[4].strftime("%H:%M %d/%m/%Y") if trip[4] else '' }}</td>
+                        <td style="padding: 10px; color: var(--success); font-weight: bold;">{{ "{:,.0f}".format(trip[5]).replace(',', '.') }} đ</td>
+                        <td style="padding: 10px; display: flex; gap: 5px;">
+                            <button type="button" class="btn btn-secondary" style="padding: 5px 10px;" onclick="document.getElementById('editTripModal-{{trip[0]}}').style.display='flex'"><i class="fas fa-edit"></i></button>
+                            <form action="{{ url_for('delete_trip', machuyen=trip[0]) }}" method="POST" onsubmit="return confirm('XÁC NHẬN CHÍNH THỨC: Bạn thực sự muốn HUỶ CHUYẾN XE NÀY và huỷ toàn bộ vé phát sinh từ nó không? Hành động này sẽ xoá sạch dữ liệu về chuyến.');">
+                                <button class="btn btn-secondary" style="padding: 5px 10px; background: rgba(255,0,0,0.2); color: #ff6b81; border: none;"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" style="text-align: center; padding: 1rem;">Chưa có chuyến xe nào</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- LỊCH SỬ GIAO DỊCH -->
+<div class="glass-card" style="padding: 1.5rem;">
+    <h3 class="mb-4"><i class="fas fa-file-invoice-dollar"></i> Lịch Sử Giao Dịch Bán Vé</h3>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--border); color: var(--text-muted);">
+                    <th style="padding: 15px;">Mã Giao Dịch</th>
+                    <th style="padding: 15px;">Khách Hàng</th>
+                    <th style="padding: 15px;">Nội Dung</th>
+                    <th style="padding: 15px;">Thời Gian</th>
+                    <th style="padding: 15px; text-align: right;">Số Tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pm in payments %}
+                <tr style="border-bottom: 1px solid var(--border); transition: 0.3s;" class="hover-bg-light">
+                    <td style="padding: 15px;">#{{ pm[0] }}</td>
+                    <td style="padding: 15px; font-weight: bold;">{{ pm[1] }}</td>
+                    <td style="padding: 15px; color: var(--text-muted);">{{ pm[4] }}</td>
+                    <td style="padding: 15px;">{{ pm[3].strftime("%d/%m/%Y %H:%M") if pm[3] else '' }}</td>
+                    <td style="padding: 15px; text-align: right; color: var(--success); font-weight: bold; font-size: 1.1rem;">
+                        + {{ "{:,.0f}".format(pm[2]).replace(',', '.') }} đ
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" style="text-align: center; padding: 2rem;">Chưa có giao dịch phát sinh</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .hover-bg-light:hover {
+        background: rgba(255,255,255,0.05);
+    }
+</style>
+
+{% for trip in trips %}
+<div id="editTripModal-{{trip[0]}}" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 999;">
+    <div class="glass-card" style="width: 400px; padding: 2rem;">
+        <h3 class="mb-4">Sửa Chuyến Xe #{{trip[0]}}</h3>
+        <p class="mb-4" style="color: var(--primary);">Tuyến đi: {{trip[2]}} <i class="fas fa-arrow-right"></i> {{trip[3]}}</p>
+        <form method="POST" action="{{ url_for('edit_trip', machuyen=trip[0]) }}">
+            <div class="form-group mb-3">
+                <label>Dời thời gian xuất phát:</label>
+                <input type="datetime-local" name="thoigian" class="form-control mt-2" value="{{ trip[4].strftime('%Y-%m-%dT%H:%M') if trip[4] else '' }}" required>
+            </div>
+            <div class="form-group mb-4">
+                <label>Chốt lại giá vé (VNĐ):</label>
+                <input type="number" min="0" name="giave" class="form-control mt-2" value="{{ trip[5] | int }}" required>
+            </div>
+            <div class="d-flex" style="gap: 10px;">
+                <button type="submit" class="btn" style="flex: 1;"><i class="fas fa-save"></i> Áp dụng</button>
+                <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="document.getElementById('editTripModal-{{trip[0]}}').style.display='none'">Đóng</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endfor %}
+
+<!-- VÙNG NGUY HIỂM -->
+<div class="glass-card" style="margin-top: 4rem; border: 1px solid rgba(255, 71, 87, 0.3); background: rgba(255, 71, 87, 0.05); padding: 1.5rem;">
+    <h3 style="color: #ff4757; margin-bottom: 1rem;"><i class="fas fa-exclamation-triangle"></i> Vùng Nguy Hiểm</h3>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Hành động này sẽ xóa toàn bộ lịch sử giao dịch và đưa tất cả các ghế đã đặt về trạng thái "Trống". Bạn không thể khôi phục lại dữ liệu sau khi thực hiện.</p>
+    
+    <form action="{{ url_for('reset_system') }}" method="POST" onsubmit="return confirm('CẢNH BÁO CỰC NGUY HIỂM: Bạn có chắc chắn muốn xóa TOÀN BỘ doanh thu và reset lại trạng thái tất cả các vé xe không?');">
+        <button type="submit" class="btn" style="background: #ff4757; border: none; padding: 10px 20px;">
+            <i class="fas fa-trash-alt"></i> RESET TOÀN BỘ DOANH THU & HỆ THỐNG
+        </button>
+    </form>
+</div>
+
+{% endblock %}
